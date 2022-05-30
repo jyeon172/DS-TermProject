@@ -56,7 +56,7 @@ Data PreProcessing Functions
 def change_wrong_name(dt):  # Change 'None-Sympton' in original data to 'None Symptom'
     for i in range(len(dt)):
         s = dt['Symptoms'][i]
-        if (s == 'None-Sympton'):
+        if s == 'None-Sympton':
             dt['Symptoms'][i] = 'None-Symptom'
 
     return dt
@@ -65,7 +65,7 @@ def change_wrong_name(dt):  # Change 'None-Sympton' in original data to 'None Sy
 def chk_wrong_age_and_treat(dt):  # treating wrong data
     for i in range(len(dt)):
         a = dt['Age'][i]
-        if (a >= 150 or a < 0):  # age is wrong data
+        if a >= 150 or a < 0:  # age is wrong data
             dt['Age'][i] = np.NAN  # make it NaN
 
     # fill NaN data
@@ -76,7 +76,7 @@ def chk_wrong_age_and_treat(dt):  # treating wrong data
 
 
 def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each row
-    if ('Country' in dt_origin.columns.tolist()):
+    if 'Country' in dt_origin.columns.tolist():
         dt_origin = dt_origin.drop(labels='Country', axis=1)
 
     symp_cnt = []
@@ -84,12 +84,12 @@ def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each r
 
     for i in range(len(data)):  # in every row
         symp = len(dt_origin['Symptoms'][i].split(','))  # count the number of symptoms
-        if ('None-Symptom' in dt_origin['Symptoms'][i].split(',')):
+        if 'None-Symptom' in dt_origin['Symptoms'][i].split(','):
             symp = symp - 1
         symp_cnt.append(symp)
 
         expSymp = len(dt_origin['Experiencig_Symptoms'][i].split(','))  # count the number of ExpSympts
-        if ('None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(',')):
+        if 'None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(','):
             expSymp = expSymp - 1
         expSymp_cnt.append(expSymp)
 
@@ -116,11 +116,11 @@ def get_condition(dt_origin):  # get severity level(=condition): none=0, mild=1,
         a = ''.join(list1)
         return a
 
-    df['Condition'] = df['Condition'].apply(removing)  ##to change data type list => string
+    df['Condition'] = df['Condition'].apply(removing)  # to change data type list => string
     df['Condition'] = df['Condition'].apply(pd.to_numeric)  # string to float
 
     # df = df.join(df['Condition']) #join Condition data
-    df.drop(severity_columns, axis=1, inplace=True)  # drop all Severy columns except 'Condition'
+    df.drop(severity_columns, axis=1, inplace=True)  # drop all Severity columns except 'Condition'
 
     return df
 
@@ -155,15 +155,15 @@ def one_hot_age(dt):  # one-hot encoding for 'Age' Column
     dumnie = pd.DataFrame(zero_matrix, columns=cols)
 
     for i in range(len(data_col)):
-        if (data_col[i] < 10):
+        if data_col[i] < 10:
             dumnie.iloc[i, 0] = 1
-        elif (data_col[i] < 20):
+        elif data_col[i] < 20:
             dumnie.iloc[i, 1] = 1
-        elif (data_col[i] < 25):
+        elif data_col[i] < 25:
             dumnie.iloc[i, 2] = 1
-        elif (data_col[i] < 60):
+        elif data_col[i] < 60:
             dumnie.iloc[i, 3] = 1
-        elif (data_col[i] >= 60):
+        elif data_col[i] >= 60:
             dumnie.iloc[i, 4] = 1
 
     dt = dt.drop(labels='Age', axis=1)
