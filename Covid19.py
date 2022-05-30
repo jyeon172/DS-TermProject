@@ -1,3 +1,11 @@
+"""
+Data Science
+Term Project
+Helps self-diagnosis of COVID-19 through body symptoms
+202035509 KIM YEEUN
+202035518 NOH HYUNGJU
+202035521 PARK JEONGYEON
+"""
 import numpy as np
 import pandas as pd
 import seaborn as sns
