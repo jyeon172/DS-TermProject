@@ -1,3 +1,19 @@
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+import warnings
+warnings.filterwarnings('ignore')
+
+pd.options.display.max_columns = None
+pd.options.display.width = None
+
 def do_analysis(df):
     # Set indicators and target features
     indicators = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
