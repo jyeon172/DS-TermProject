@@ -1,16 +1,13 @@
 # DS-TermProject
 This project is a Term-Project of Data Science Lecture.
 
-==========
-Covid19.py <-- This file is our final result
-==========
+*Covid19.py* <-- This file is our final result
 
 Also, we uploaded our algorithm that can be used in general.
 
-==========
-data_analysis.py <-- This is data analysis code using Random Forest Classifier, Logistic Regression, and Decision Tree Classifier
-one_hot_encoidng.py <-- This is one-hot encoding code using Pandas and Numpy
-==========
+*data_analysis.py* <-- This is data analysis code using Random Forest Classifier, Logistic Regression, and Decision Tree Classifier
+*one_hot_encoidng.py* <-- This is one-hot encoding code using Pandas and Numpy
+
 
 Our team members:
   202035509 KIM YEEUN
