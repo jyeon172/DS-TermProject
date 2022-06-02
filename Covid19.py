@@ -469,7 +469,7 @@ def target(fs, ts, t, algo):
 
 
 def do_split(x, y, algo):
-    # divide into test and train dataset
+    # divide into test and train dataset with shuffle=True, stratify=y
     x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=42, test_size=.3, shuffle=True, stratify=y)
 
     k_fold = KFold(n_splits=10, shuffle=True, random_state=0)  # K-Fold (for k=10)
