@@ -18,12 +18,14 @@ Our team members:
 To help people predict the severity of COVID-19 whith his/her/their symptoms
  
 === WARNING ===
+
 This is NOT an ACCURATE DIAGNOSIS, it is just a PREDICTION based on Symptoms.
 It is recommended that you use this for SIMPLE GUESSWORK ONLY, and contact medical professional for accurate diagnosis.
 
 
 # Used Data
 We used 'COVID-19 Symptoms Checker' data from BILAL HUNGUND
+
 Kaggle:
   https://www.kaggle.com/datasets/iamhungundji/covid19-symptoms-checker?select=Cleaned-Data.csv
   
