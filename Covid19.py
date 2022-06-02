@@ -359,6 +359,7 @@ def do_visualization():
     plt.show()
 
     # barplot
+    # code resource : https://www.kaggle.com/code/sanjanabhute03/uslclustering-project
     indicators = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
                   'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
                   'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
