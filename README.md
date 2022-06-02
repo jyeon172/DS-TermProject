@@ -1,12 +1,12 @@
 # DS-TermProject
 This project is a Term-Project of Data Science Lecture.
 
-*Covid19.py* <-- This file is our final result
-
+We uploaded our final code.
 Also, we uploaded our algorithm that can be used in general.
 
-*data_analysis.py* <-- This is data analysis code using Random Forest Classifier, Logistic Regression, and Decision Tree Classifier
-*one_hot_encoidng.py* <-- This is one-hot encoding code using Pandas and Numpy
+*Covid19.py <-- This file is our final result
+*data_analysis.py <-- This is data analysis code using Random Forest Classifier, Logistic Regression, and Decision Tree Classifier
+*one_hot_encoidng.py <-- This is one-hot encoding code using Pandas and Numpy
 
 
 Our team members:
@@ -30,13 +30,16 @@ Kaggle:
 
 # Used Algorithm
 In data preprocessing
+
   One-hot encoding <-- to get data easy-to-handle
   PCA <-- to make data distribution
  
 In data analysis
-  Logistic Regression Model <-- to predict severity level using symptoms
+
+  Logistic Regression Model <-- to predict severity level using symptoms (data we used is categorical data, so we used logistic)
   Random Forest Classifier <-- to find severity level using symptoms
   Decision Tree Classifier <-- to find severity level using symptoms
   
-In data evaluation:
+In data evaluation
+
   K-fold (test 30%, k=10)
