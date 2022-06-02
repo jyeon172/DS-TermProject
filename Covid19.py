@@ -30,16 +30,20 @@ pd.options.display.width = None
 Data Print Functions
 '''
 
-
-def do_printInfo(dt):
+# Functions for output of initial data
+def do_printInfo(dt): 
     print(dt)
     print()
+    
+    # To determine the column name, missing values by column, and data type by column that exist in the initial data
     print(dt.info())
     print()
     print(dt.isna().sum())
     print()
     print(dt.describe())
     print()
+    
+    # Items by Features
     print(dt['Country'].unique())
     print()
     print(dt['Symptoms'].unique())
