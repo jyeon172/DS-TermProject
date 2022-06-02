@@ -10,9 +10,9 @@ Also, we uploaded our algorithm that can be used in general.
 
 
 Our team members:
-  202035509 KIM YEEUN
-  202035518 NOH HYUNGJU
-  202035521 PARK JEONGYEON
+  * 202035509 KIM YEEUN
+  * 202035518 NOH HYUNGJU
+  * 202035521 PARK JEONGYEON
   
 # Project Objection
 To help people predict the severity of COVID-19 whith his/her/their symptoms
