@@ -33,14 +33,14 @@ Kaggle:
 # Used Algorithm
 In data preprocessing
 
-  One-hot encoding <-- to get data easy-to-handle
-  PCA <-- to make data distribution
+  - One-hot encoding <-- to get data easy-to-handle
+  - PCA <-- to make data distribution
  
 In data analysis
 
-  Logistic Regression Model <-- to predict severity level using symptoms (data we used is categorical data, so we used logistic)
-  Random Forest Classifier <-- to find severity level using symptoms
-  Decision Tree Classifier <-- to find severity level using symptoms
+  - Logistic Regression Model <-- to predict severity level using symptoms (data we used is categorical data, so we used logistic)
+  - Random Forest Classifier <-- to find severity level using symptoms
+  - Decision Tree Classifier <-- to find severity level using symptoms
   
 In data evaluation
 
