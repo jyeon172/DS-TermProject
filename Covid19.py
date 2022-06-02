@@ -405,7 +405,7 @@ Analysis & Evaluation Functions
 
 
 def do_analysis(df, indicators, target_columns):
-    # Set indicators and target features
+    # Set features and targets
     features = df[indicators]
     targets = df[target_columns]
 
@@ -617,7 +617,7 @@ do_visualization()
 '''
 Data Analysis & Evaluation
 '''
-
+# Set indicators and target features
 indicators_of_data = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
                       'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
                       'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
