@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
 
+
 # one-hot encoding code resource: https://steadiness-193.tistory.com/99
-def one_hot(dt, data_idx, prefix): # dt: entire DataFrame to encode, data_idx: index of data to encode, prefix: feature prefix string to add after encoding
+def one_hot(dt, data_idx, prefix):
+    # dt: entire DataFrame to encode
+    # data_idx: index of data to encode
+    # prefix: feature prefix string to add after encoding
     all_ele = []
     data_col = dt.iloc[:, data_idx]  # get data column using index
 
@@ -21,4 +25,5 @@ def one_hot(dt, data_idx, prefix): # dt: entire DataFrame to encode, data_idx: i
     data_joined = dt.join(dumnie.add_prefix(prefix))  # join one-hot encoding dataframe
 
     print('One-hot Encoding Success')
+
     return data_joined

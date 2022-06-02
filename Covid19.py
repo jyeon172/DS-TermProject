@@ -30,21 +30,22 @@ pd.options.display.width = None
 Data Print Functions
 '''
 
+
 # Functions for output of initial data
-def do_printInfo(dt): 
+def do_printInfo(dt):
     print(dt)
     print()
-    
+
     # To determine the column name, missing values by column, and data type by column that exist in the initial data
     print(dt.info())
     print()
     print(dt.isna().sum())
     print()
-    
+
     # It is used to summarize major statistics according to numeric columns of initial data.
     print(dt.describe())
     print()
-    
+
     # Items by Features
     print(dt['Country'].unique())
     print()
@@ -90,7 +91,7 @@ def chk_wrong_age_and_treat(dt):  # treating wrong data
 
 
 def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each row
-    if 'Country' in dt_origin.columns.tolist():
+    if 'Country' in dt_origin.columns.tolist():  # if 'Country' feature is not dropped from data, drop it
         dt_origin = dt_origin.drop(labels='Country', axis=1)
 
     symp_cnt = []
@@ -98,12 +99,13 @@ def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each r
 
     for i in range(len(data)):  # in every row
         symp = len(dt_origin['Symptoms'][i].split(','))  # count the number of symptoms
-        if 'None-Symptom' in dt_origin['Symptoms'][i].split(','):
+        if 'None-Symptom' in dt_origin['Symptoms'][i].split(
+                ','):  # because 'None-Symptom' means the number of symtom is 0, so minus 1 from counted data (1)
             symp = symp - 1
         symp_cnt.append(symp)
 
         expSymp = len(dt_origin['Experiencig_Symptoms'][i].split(','))  # count the number of ExpSympts
-        if 'None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(','):
+        if 'None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(','):  # Same with 'None-Symptom'
             expSymp = expSymp - 1
         expSymp_cnt.append(expSymp)
 
@@ -139,7 +141,9 @@ def get_condition(dt_origin):  # get severity level(=condition): none=0, mild=1,
     return df
 
 
-def one_hot(dt, data_idx, prefix):  # one-hot encoding
+# one-hot encoding code resource: https://steadiness-193.tistory.com/99
+def one_hot(dt, data_idx,
+            prefix):  # dt: entire DataFrame to encode, data_idx: index of data to encode, prefix: feature prefix string to add after encoding
     all_ele = []
     data_col = dt.iloc[:, data_idx]  # get data column using index
 
@@ -151,7 +155,7 @@ def one_hot(dt, data_idx, prefix):  # one-hot encoding
     dumnie = pd.DataFrame(zero_matrix, columns=ele)
 
     for i, elem in enumerate(data_col):  # update one-hot table 1 for each element
-        index = dumnie.columns.get_indexer(elem.split(','))
+        index = dumnie.columns.get_indexer(elem.split(','))  # get index of dumnie data
         dumnie.iloc[i, index] = 1
 
     dt = dt.iloc[:, data_idx:]  # drop data before encoding
@@ -163,25 +167,26 @@ def one_hot(dt, data_idx, prefix):  # one-hot encoding
 
 def one_hot_age(dt):  # one-hot encoding for 'Age' Column
     data_col = dt['Age']
-    cols = ['0-9', '10-19', '20-24', '25-59', '60+']
+    cols = ['0-9', '10-19', '20-24', '25-59', '60+']  # groups of age
 
     zero_matrix = np.zeros((len(data_col), len(cols)))
-    dumnie = pd.DataFrame(zero_matrix, columns=cols)
+    dumnie = pd.DataFrame(zero_matrix, columns=cols)  # make empty dataframe
 
     for i in range(len(data_col)):
-        if data_col[i] < 10:
+        # if 'Age' data is in particular age group, make the value of dataframe[age row, group col] = 1
+        if data_col[i] < 10:  # group 0-9
             dumnie.iloc[i, 0] = 1
-        elif data_col[i] < 20:
+        elif data_col[i] < 20:  # group 10-19
             dumnie.iloc[i, 1] = 1
-        elif data_col[i] < 25:
+        elif data_col[i] < 25:  # group 20-24
             dumnie.iloc[i, 2] = 1
-        elif data_col[i] < 60:
+        elif data_col[i] < 60:  # group 24-59
             dumnie.iloc[i, 3] = 1
-        elif data_col[i] >= 60:
+        elif data_col[i] >= 60:  # group 60+
             dumnie.iloc[i, 4] = 1
 
-    dt = dt.drop(labels='Age', axis=1)
-    data_joined = dt.join(dumnie.add_prefix('Age_'))
+    dt = dt.drop(labels='Age', axis=1)  # drop Age (before encoding data)
+    data_joined = dt.join(dumnie.add_prefix('Age_'))  # add encoding dataframe
 
     print('One-hot Encoding Success')
     return data_joined
@@ -207,6 +212,7 @@ def get_Conditions(dt):  # merge 'Severity_' columns in String
     print('make heatmap start')
     df = dt.copy()
     severity_columns = df.filter(like='Severity_').columns
+
     df['Severity_None'].replace({1: 'None', 0: 'No'}, inplace=True)
     df['Severity_Mild'].replace({1: 'Mild', 0: 'No'}, inplace=True)
     df['Severity_Moderate'].replace({1: 'Moderate', 0: 'No'}, inplace=True)
@@ -230,28 +236,34 @@ def get_Conditions(dt):  # merge 'Severity_' columns in String
 
 def get_score(dt):  # get Symptoms score using Symptoms_sum and ExpSymps_sum
     df = dt.copy()
-    idx_syp_start = dt.columns.get_loc('Symptoms_Fever')
-    idx_syp_end = dt.columns.get_loc('Symptoms_None-Symptom')
-    idx_expSyp_start = dt.columns.get_loc('ExpSympt_Pains')
-    idx_expSyp_end = dt.columns.get_loc('ExpSympt_None_Experiencing')
-    df['Symptoms_Score'] = df.iloc[:, idx_syp_start:idx_syp_end].sum(axis=1) + df.iloc[:, idx_expSyp_start:idx_expSyp_end].sum(axis=1)
+    idx_syp_start = dt.columns.get_loc('Symptoms_Fever')  # the index of first feature of Symptoms_
+    idx_syp_end = dt.columns.get_loc('Symptoms_None-Symptom')  # the index of last feature of Symptoms_
+    idx_expSyp_start = dt.columns.get_loc('ExpSympt_Pains')  # the index of first feature of ExpSympt_
+    idx_expSyp_end = dt.columns.get_loc('ExpSympt_None_Experiencing')  # the index of last feature of ExpSympt_
+
+    # the score is number of symptoms and experiencing symptoms
+    df['Symptoms_Score'] = df.iloc[:, idx_syp_start:idx_syp_end].sum(axis=1) + df.iloc[:,
+                                                                               idx_expSyp_start:idx_expSyp_end].sum(
+        axis=1)
 
     return df
 
 
-def get_htmp_after_encod(dt):
+# code resource: https://www.kaggle.com/code/harshaggarwal7/covid-19-symptom-analysis?scriptVersionId=40251034&cellId=36
+def get_htmp_after_encod(dt):  # dt: dataframe to make heatmap
     df = dt.copy()
     df = get_score(df)
     df = get_condition(df)
 
     from pylab import rcParams
     rcParams['figure.figsize'] = 13, 18
-    corrmat = df.corr()
+    corrmat = df.corr()  # make correlation matrix
     cols = corrmat.index
-    cm = np.corrcoef(df[cols].values.T)
-    sns.set(font_scale=1.25)
+    cm = np.corrcoef(df[cols].values.T)  # get correlation coefficient of correlation matrix
+
+    sns.set(font_scale=1.25)  # set heatmap plot
     sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f',
-                annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
+                annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)  # make heatmap
     plt.title('Heatmap of All data')
     plt.show()
 
@@ -261,11 +273,11 @@ def get_htmp_after_encod(dt):
 def do_PCA_partial(data_origin):  # PCA just for partial (drop severity:one-hot and Condition: string)
     dt = data_origin.copy()
     severity_columns = dt.filter(like='Severity_').columns
-    dt.drop(severity_columns, axis=1, inplace=True)
-    dt.drop('Condition', axis=1, inplace=True)
+    dt.drop(severity_columns, axis=1, inplace=True)  # drop severity because they are one-hot encoded columns
+    dt.drop('Condition', axis=1, inplace=True)  # drop condition because it is string
 
     scaler = preprocessing.StandardScaler()
-    train_df_scaled = scaler.fit_transform(dt)
+    train_df_scaled = scaler.fit_transform(dt)  # data scaling
 
     pca = PCA(n_components=2)
     df = pca.fit_transform(train_df_scaled)
@@ -337,9 +349,11 @@ def do_preprocessing(dt_oh):
 Visualization Functions
 '''
 
+
 # Function to count the number of symptoms
 def get_symptom_count(the_list):
     return sum(the_list.values)
+
 
 # Functions for different visualizations
 def do_visualization():
@@ -388,8 +402,8 @@ def do_visualization():
 
     # countplot - by severity
     # code resource : https://www.kaggle.com/code/sanjanabhute03/uslclustering-project
-    for i in range(len(severity)): # Repeating statements as many as severity
-        ind = indicators.copy() # shallow copy
+    for i in range(len(severity)):  # Repeating statements as many as severity
+        ind = indicators.copy()  # shallow copy
         sev = severity[i]
         ind.append(sev)
 
@@ -400,7 +414,7 @@ def do_visualization():
         plt.figure(figsize=(10, 10))
         ax1 = sns.countplot(data=feats, x='Total_Symptom', hue=sev)
         plt.xlabel("Total symptom occurence on someone")
-        
+
         # representing values above the graph
         for p in ax1.patches:
             height = p.get_height()
@@ -414,24 +428,19 @@ Analysis & Evaluation Functions
 '''
 
 
-def do_analysis(df):
-    # Set indicators and target features
-    indicators = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
-                  'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
-                  'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
-                  'Age_60+', 'Gender_Male', 'Gender_Female', 'Gender_Transgender']
-    target_columns = ['Severity_None', 'Severity_Mild', 'Severity_Moderate', 'Severity_Severe']
+def do_analysis(df, indicators, target_columns):
+    # Set features and targets
     features = df[indicators]
     targets = df[target_columns]
 
     features['Total_Symptom'] = features[indicators].apply(get_symptom_count, axis=1)
 
-    # 1: Random Forest Classifier, 2: Logistic Regression, 3: Decision Tree Classifier
+    # 1: Logistic Regression, 2: Decision Tree Classifier, 3: Random Forest Classifier
     algo = [1, 2, 3]
 
     # Analysis for each Severity with 3 kinds of algorithm
     # Severity - Severity_None, Severity_Mild, Severity_Moderate, Severity_Severe
-    # Analysis - Random Forest Classifier, Logistic Regression, Decision Tree Classifier
+    # Analysis - Logistic Regression, Decision Tree Classifier, Random Forest Classifier
     for i in range(len(target_columns)):
         for j in range(len(algo)):
             print("====== For {} ======".format(target_columns[i]))
@@ -461,20 +470,94 @@ def target(fs, ts, t, algo):
 
 def do_split(x, y, algo):
     # divide into test and train dataset
-    x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=42, test_size=.3)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=42, test_size=.3, shuffle=True, stratify=y)
 
     k_fold = KFold(n_splits=10, shuffle=True, random_state=0)  # K-Fold (for k=10)
 
-    if algo == 1:  # Random Forest Classifier
-        do_RFC(x_train, x_test, y_train, y_test, k_fold)
-    elif algo == 2:  # Logistic Regression
+    if algo == 1:  # Logistic Regression
         do_LR(x_train, x_test, y_train, y_test, k_fold)
-    elif algo == 3:  # Decision Tree Classifier
+    elif algo == 2:  # Decision Tree Classifier
         do_DTC(x_train, x_test, y_train, y_test, k_fold)
+    elif algo == 3:  # Random Forest Classifier
+        do_RFC(x_train, x_test, y_train, y_test, k_fold)
 
 
-def do_RFC(x_train, x_test, y_train, y_test, k_fold):
-    # Random Forest Classifier
+# Logistic Regression
+# Create a base model: LogisticRegression()
+# Create the parameter grid based on the results of random search: GridSearchCV(,,,)
+# params grid = {
+#     "penalty": ['l1', 'l2', 'elasticnet', 'none'],
+#     "solver": ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+# }
+# Create a tuned model with grid search: .best_estimator_
+# code resource : https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+def do_LR(x_train, x_test, y_train, y_test, k_fold):
+    print("<< Logistic Regression >>")
+    lr = LogisticRegression()
+    lr.fit(x_train, y_train)
+    print("> Logistic Regression score: {}".format(lr.score(x_test, y_test)))  # Print result
+
+    # Print confusion matrix for Logistic Regression
+    print("> Confusion Matrix")
+    do_cm(lr, x_test, y_test)
+
+    # Find the best estimator using Grid Search
+    params = {
+        "penalty": ['l1', 'l2', 'elasticnet', 'none'],
+        "solver": ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+    }
+    lr_reg = GridSearchCV(lr, params, cv=10, n_jobs=10)
+    lr_reg.fit(x_train, y_train)
+    print("> The best estimator using GridSearch: {}".format(lr_reg.best_estimator_))
+
+    # Set model with best estimator
+    lr_tune = lr_reg.best_estimator_
+    lr_tune.fit(x_train, y_train)
+    print("> Logistic Regression tuned score: {}".format(lr_tune.score(x_test, y_test)))  # Print result
+
+    # Print confusion matrix for tuned Logistic Regression
+    print("> Confusion Matrix using tuned")
+    do_cm(lr_tune, x_test, y_test)
+
+    # Do evaluation with k-fold (k=10)
+    do_evaluation(lr_tune, x_test, y_test, k_fold)
+
+
+# code resource : https://www.kaggle.com/code/sararasoulian/classification
+def do_DTC(x_train, x_test, y_train, y_test, k_fold):  # Decision Tree Classifier
+    print("<< Decision Tree Classifier >>")
+    dtc = DecisionTreeClassifier()
+    dtc.fit(x_train, y_train)
+    print("> Decision Tree Classifier score: {}".format(dtc.score(x_test, y_test)))  # Print result
+
+    # Print confusion matrix for Decision Tree Classifier
+    print("> Confusion Matrix")
+    do_cm(dtc, x_test, y_test)
+
+    # Find the best estimator using Grid Search
+    params = {
+        "criterion": ["gini", "entropy"],
+        "max_depth": [15, 20, 25],
+    }
+    dtc_reg = GridSearchCV(dtc, params, cv=10, n_jobs=10)
+    dtc_reg.fit(x_train, y_train)
+    print("> The best estimator using GridSearch: {}".format(dtc_reg.best_estimator_))
+
+    # Set model with best estimator
+    dtc_tune = dtc_reg.best_estimator_
+    dtc_tune.fit(x_train, y_train)
+    print("> Decision Tree Classifier tuned score: {}".format(dtc_tune.score(x_test, y_test)))  # Print result
+
+    # Print confusion matrix for tuned Decision Tree Classifier
+    print("> Confusion Matrix using tuned")
+    do_cm(dtc_tune, x_test, y_test)
+
+    # Do evaluation with k-fold (k=10)
+    do_evaluation(dtc_tune, x_test, y_test, k_fold)
+
+
+# code resource : https://www.kaggle.com/code/sararasoulian/classification
+def do_RFC(x_train, x_test, y_train, y_test, k_fold):  # Random Forest Classifier
     print("<< Random Forest Classifier >>")
     rfc = RandomForestClassifier()
     rfc.fit(x_train, y_train)
@@ -507,73 +590,7 @@ def do_RFC(x_train, x_test, y_train, y_test, k_fold):
     do_evaluation(rfc_tune, x_test, y_test, k_fold)
 
 
-def do_LR(x_train, x_test, y_train, y_test, k_fold):
-    # Logistic Regression
-    print("<< Logistic Regression >>")
-    lr = LogisticRegression()
-    lr.fit(x_train, y_train)
-    print("> Logistic Regression score: {}".format(lr.score(x_test, y_test)))  # Print result
-
-    # Print confusion matrix for Logistic Regression
-    print("> Confusion Matrix")
-    do_cm(lr, x_test, y_test)
-
-    # Find the best estimator using Grid Search
-    params = {
-        "penalty": ['l1', 'l2', 'elasticnet', 'none'],
-        "solver": ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
-    }
-    lr_reg = GridSearchCV(lr, params, cv=10, n_jobs=10)
-    lr_reg.fit(x_train, y_train)
-    print("> The best estimator using GridSearch: {}".format(lr_reg.best_estimator_))
-
-    # Set model with best estimator
-    lr_tune = lr_reg.best_estimator_
-    lr_tune.fit(x_train, y_train)
-    print("> Logistic Regression tuned score: {}".format(lr_tune.score(x_test, y_test)))  # Print result
-
-    # Print confusion matrix for tuned Logistic Regression
-    print("> Confusion Matrix using tuned")
-    do_cm(lr_tune, x_test, y_test)
-
-    # Do evaluation with k-fold (k=10)
-    do_evaluation(lr_tune, x_test, y_test, k_fold)
-
-
-def do_DTC(x_train, x_test, y_train, y_test, k_fold):
-    # Decision Tree Classifier
-    print("<< Decision Tree Classifier >>")
-    dtc = DecisionTreeClassifier()
-    dtc.fit(x_train, y_train)
-    print("> Decision Tree Classifier score: {}".format(dtc.score(x_test, y_test)))  # Print result
-
-    # Print confusion matrix for Decision Tree Classifier
-    print("> Confusion Matrix")
-    do_cm(dtc, x_test, y_test)
-
-    # Find the best estimator using Grid Search
-    params = {
-        "criterion": ["gini", "entropy"],
-        "max_depth": [15, 20, 25],
-    }
-    dtc_reg = GridSearchCV(dtc, params, cv=10, n_jobs=10)
-    dtc_reg.fit(x_train, y_train)
-    print("> The best estimator using GridSearch: {}".format(dtc_reg.best_estimator_))
-
-    # Set model with best estimator
-    dtc_tune = dtc_reg.best_estimator_
-    dtc_tune.fit(x_train, y_train)
-    print("> Decision Tree Classifier tuned score: {}".format(dtc_tune.score(x_test, y_test)))  # Print result
-
-    # Print confusion matrix for tuned Decision Tree Classifier
-    print("> Confusion Matrix using tuned")
-    do_cm(dtc_tune, x_test, y_test)
-
-    # Do evaluation with k-fold (k=10)
-    do_evaluation(dtc_tune, x_test, y_test, k_fold)
-
-
-def do_cm(model, x_test, y_test):
+def do_cm(model, x_test, y_test):  # Print Confusion matrix
     y_pred = model.predict(x_test)
     cm = confusion_matrix(y_test, y_pred)  # Set confusion matrix
     # sns.heatmap(cm, annot=True)
@@ -581,7 +598,7 @@ def do_cm(model, x_test, y_test):
     print(cm)  # Print result
 
 
-def do_evaluation(tune, x_test, y_test, kf):
+def do_evaluation(tune, x_test, y_test, kf):  # Print K-Fold validation Accuracy
     # Do evaluation with K-Fold (k=10)
     scores = cross_val_score(tune, x_test, y_test, cv=kf, n_jobs=1, scoring="accuracy")
     # Print result
@@ -632,6 +649,12 @@ do_visualization()
 '''
 Data Analysis & Evaluation
 '''
+# Set indicators and target features
+indicators_of_data = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
+                      'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
+                      'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
+                      'Age_60+', 'Gender_Male', 'Gender_Female', 'Gender_Transgender']
+target_cols_of_data = ['Severity_None', 'Severity_Mild', 'Severity_Moderate', 'Severity_Severe']
 
-do_analysis(data_oh)
-
+# Do analysis and evaluation
+do_analysis(data_oh, indicators_of_data, target_cols_of_data)
