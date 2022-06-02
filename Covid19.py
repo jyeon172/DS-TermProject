@@ -40,6 +40,8 @@ def do_printInfo(dt):
     print()
     print(dt.isna().sum())
     print()
+    
+    # It is used to summarize major statistics according to numeric columns of initial data.
     print(dt.describe())
     print()
     
@@ -339,11 +341,11 @@ def do_preprocessing(dt_oh):
 Visualization Functions
 '''
 
-
+# Function to count the number of symptoms
 def get_symptom_count(the_list):
     return sum(the_list.values)
 
-
+# Functions for different visualizations
 def do_visualization():
     # countplot
     fig, ax = plt.subplots(1, 4, figsize=(20, 5))
