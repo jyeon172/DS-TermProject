@@ -404,13 +404,8 @@ Analysis & Evaluation Functions
 '''
 
 
-def do_analysis(df):
+def do_analysis(df, indicators, target_columns):
     # Set indicators and target features
-    indicators = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
-                  'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
-                  'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
-                  'Age_60+', 'Gender_Male', 'Gender_Female', 'Gender_Transgender']
-    target_columns = ['Severity_None', 'Severity_Mild', 'Severity_Moderate', 'Severity_Severe']
     features = df[indicators]
     targets = df[target_columns]
 
@@ -623,5 +618,11 @@ do_visualization()
 Data Analysis & Evaluation
 '''
 
-do_analysis(data_oh)
+indicators_of_data = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
+                      'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
+                      'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
+                      'Age_60+', 'Gender_Male', 'Gender_Female', 'Gender_Transgender']
+target_cols_of_data = ['Severity_None', 'Severity_Mild', 'Severity_Moderate', 'Severity_Severe']
+
+do_analysis(data_oh, indicators_of_data, target_cols_of_data)
 
