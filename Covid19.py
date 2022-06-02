@@ -349,6 +349,7 @@ def get_symptom_count(the_list):
 def do_visualization():
     # countplot
     fig, ax = plt.subplots(1, 4, figsize=(20, 5))
+    # The number of data by severity
     sns.countplot(data_oh['Severity_None'], ax=ax[0])
     sns.countplot(data_oh['Severity_Mild'], ax=ax[1])
     sns.countplot(data_oh['Severity_Moderate'], ax=ax[2])
@@ -390,9 +391,9 @@ def do_visualization():
     plt.show()
 
     # countplot - by severity
-
-    for i in range(len(severity)):
-        ind = indicators.copy()
+    # code resource : https://www.kaggle.com/code/sanjanabhute03/uslclustering-project
+    for i in range(len(severity)): # Repeating statements as many as severity
+        ind = indicators.copy() # shallow copy
         sev = severity[i]
         ind.append(sev)
 
@@ -403,6 +404,8 @@ def do_visualization():
         plt.figure(figsize=(10, 10))
         ax1 = sns.countplot(data=feats, x='Total_Symptom', hue=sev)
         plt.xlabel("Total symptom occurence on someone")
+        
+        # representing values above the graph
         for p in ax1.patches:
             height = p.get_height()
             ax1.text(p.get_x() + p.get_width() / 2., height + 5, height, ha='center', size=9)
