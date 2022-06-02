@@ -30,16 +30,22 @@ pd.options.display.width = None
 Data Print Functions
 '''
 
-
-def do_printInfo(dt):
+# Functions for output of initial data
+def do_printInfo(dt): 
     print(dt)
     print()
+    
+    # To determine the column name, missing values by column, and data type by column that exist in the initial data
     print(dt.info())
     print()
     print(dt.isna().sum())
     print()
+    
+    # It is used to summarize major statistics according to numeric columns of initial data.
     print(dt.describe())
     print()
+    
+    # Items by Features
     print(dt['Country'].unique())
     print()
     print(dt['Symptoms'].unique())
@@ -331,14 +337,15 @@ def do_preprocessing(dt_oh):
 Visualization Functions
 '''
 
-
+# Function to count the number of symptoms
 def get_symptom_count(the_list):
     return sum(the_list.values)
 
-
+# Functions for different visualizations
 def do_visualization():
     # countplot
     fig, ax = plt.subplots(1, 4, figsize=(20, 5))
+    # The number of data by severity
     sns.countplot(data_oh['Severity_None'], ax=ax[0])
     sns.countplot(data_oh['Severity_Mild'], ax=ax[1])
     sns.countplot(data_oh['Severity_Moderate'], ax=ax[2])
@@ -349,6 +356,7 @@ def do_visualization():
     plt.show()
 
     # barplot
+    # code resource : https://www.kaggle.com/code/sanjanabhute03/uslclustering-project
     indicators = ['Symptoms_Fever', 'Symptoms_Tiredness', 'Symptoms_Dry-Cough', 'Symptoms_Difficulty-in-Breathing',
                   'Symptoms_Sore-Throat', 'ExpSympt_Pains', 'ExpSympt_Nasal-Congestion',
                   'ExpSympt_Runny-Nose', 'ExpSympt_Diarrhea', 'Age_0-9', 'Age_10-19', 'Age_20-24', 'Age_25-59',
@@ -379,9 +387,9 @@ def do_visualization():
     plt.show()
 
     # countplot - by severity
-
-    for i in range(len(severity)):
-        ind = indicators.copy()
+    # code resource : https://www.kaggle.com/code/sanjanabhute03/uslclustering-project
+    for i in range(len(severity)): # Repeating statements as many as severity
+        ind = indicators.copy() # shallow copy
         sev = severity[i]
         ind.append(sev)
 
@@ -392,6 +400,8 @@ def do_visualization():
         plt.figure(figsize=(10, 10))
         ax1 = sns.countplot(data=feats, x='Total_Symptom', hue=sev)
         plt.xlabel("Total symptom occurence on someone")
+        
+        # representing values above the graph
         for p in ax1.patches:
             height = p.get_height()
             ax1.text(p.get_x() + p.get_width() / 2., height + 5, height, ha='center', size=9)
