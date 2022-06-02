@@ -84,7 +84,7 @@ def chk_wrong_age_and_treat(dt):  # treating wrong data
 
 
 def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each row
-    if 'Country' in dt_origin.columns.tolist():
+    if 'Country' in dt_origin.columns.tolist(): # if 'Country' feature is not dropped from data, drop it
         dt_origin = dt_origin.drop(labels='Country', axis=1)
 
     symp_cnt = []
@@ -92,12 +92,12 @@ def get_counts(dt_origin):  # getting counts of Symptoms and ExpSympts in each r
 
     for i in range(len(data)):  # in every row
         symp = len(dt_origin['Symptoms'][i].split(','))  # count the number of symptoms
-        if 'None-Symptom' in dt_origin['Symptoms'][i].split(','):
+        if 'None-Symptom' in dt_origin['Symptoms'][i].split(','): # because 'None-Symptom' means the number of symtom is 0, so minus 1 from counted data (1)
             symp = symp - 1
         symp_cnt.append(symp)
 
         expSymp = len(dt_origin['Experiencig_Symptoms'][i].split(','))  # count the number of ExpSympts
-        if 'None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(','):
+        if 'None_Experiencing' in dt_origin['Experiencig_Symptoms'][i].split(','): # Same with 'None-Symptom'
             expSymp = expSymp - 1
         expSymp_cnt.append(expSymp)
 
@@ -132,8 +132,8 @@ def get_condition(dt_origin):  # get severity level(=condition): none=0, mild=1,
 
     return df
 
-
-def one_hot(dt, data_idx, prefix):  # one-hot encoding
+# one-hot encoding code resource: https://steadiness-193.tistory.com/99
+def one_hot(dt, data_idx, prefix): # dt: entire DataFrame to encode, data_idx: index of data to encode, prefix: feature prefix string to add after encoding
     all_ele = []
     data_col = dt.iloc[:, data_idx]  # get data column using index
 
@@ -145,7 +145,7 @@ def one_hot(dt, data_idx, prefix):  # one-hot encoding
     dumnie = pd.DataFrame(zero_matrix, columns=ele)
 
     for i, elem in enumerate(data_col):  # update one-hot table 1 for each element
-        index = dumnie.columns.get_indexer(elem.split(','))
+        index = dumnie.columns.get_indexer(elem.split(',')) # get index of dumnie data
         dumnie.iloc[i, index] = 1
 
     dt = dt.iloc[:, data_idx:]  # drop data before encoding
@@ -157,25 +157,25 @@ def one_hot(dt, data_idx, prefix):  # one-hot encoding
 
 def one_hot_age(dt):  # one-hot encoding for 'Age' Column
     data_col = dt['Age']
-    cols = ['0-9', '10-19', '20-24', '25-59', '60+']
+    cols = ['0-9', '10-19', '20-24', '25-59', '60+'] # groups of age
 
     zero_matrix = np.zeros((len(data_col), len(cols)))
-    dumnie = pd.DataFrame(zero_matrix, columns=cols)
+    dumnie = pd.DataFrame(zero_matrix, columns=cols) # make empty dataframe
 
-    for i in range(len(data_col)):
-        if data_col[i] < 10:
+    for i in range(len(data_col)): # if 'Age' data is in particular age group, make the value of dataframe[age row, group col] = 1
+        if data_col[i] < 10: # group 0-9
             dumnie.iloc[i, 0] = 1
-        elif data_col[i] < 20:
+        elif data_col[i] < 20: # group 10-19
             dumnie.iloc[i, 1] = 1
-        elif data_col[i] < 25:
+        elif data_col[i] < 25: # group 20-24
             dumnie.iloc[i, 2] = 1
-        elif data_col[i] < 60:
+        elif data_col[i] < 60: # group 24-59
             dumnie.iloc[i, 3] = 1
-        elif data_col[i] >= 60:
+        elif data_col[i] >= 60: # group 60+
             dumnie.iloc[i, 4] = 1
 
-    dt = dt.drop(labels='Age', axis=1)
-    data_joined = dt.join(dumnie.add_prefix('Age_'))
+    dt = dt.drop(labels='Age', axis=1) # drop Age (before encoding data)
+    data_joined = dt.join(dumnie.add_prefix('Age_')) # add encoding dataframe
 
     print('One-hot Encoding Success')
     return data_joined
@@ -201,6 +201,7 @@ def get_Conditions(dt):  # merge 'Severity_' columns in String
     print('make heatmap start')
     df = dt.copy()
     severity_columns = df.filter(like='Severity_').columns
+    
     df['Severity_None'].replace({1: 'None', 0: 'No'}, inplace=True)
     df['Severity_Mild'].replace({1: 'Mild', 0: 'No'}, inplace=True)
     df['Severity_Moderate'].replace({1: 'Moderate', 0: 'No'}, inplace=True)
@@ -224,28 +225,31 @@ def get_Conditions(dt):  # merge 'Severity_' columns in String
 
 def get_score(dt):  # get Symptoms score using Symptoms_sum and ExpSymps_sum
     df = dt.copy()
-    idx_syp_start = dt.columns.get_loc('Symptoms_Fever')
-    idx_syp_end = dt.columns.get_loc('Symptoms_None-Symptom')
-    idx_expSyp_start = dt.columns.get_loc('ExpSympt_Pains')
-    idx_expSyp_end = dt.columns.get_loc('ExpSympt_None_Experiencing')
+    idx_syp_start = dt.columns.get_loc('Symptoms_Fever') # the index of first feature of Symptoms_
+    idx_syp_end = dt.columns.get_loc('Symptoms_None-Symptom') # the index of last feature of Symptoms_
+    idx_expSyp_start = dt.columns.get_loc('ExpSympt_Pains') # the index of first feature of ExpSympt_
+    idx_expSyp_end = dt.columns.get_loc('ExpSympt_None_Experiencing') # the index of last feature of ExpSympt_
+    
+    # the score is number of symptoms and experiencing symptoms
     df['Symptoms_Score'] = df.iloc[:, idx_syp_start:idx_syp_end].sum(axis=1) + df.iloc[:, idx_expSyp_start:idx_expSyp_end].sum(axis=1)
 
     return df
 
-
-def get_htmp_after_encod(dt):
+# code resource: https://www.kaggle.com/code/harshaggarwal7/covid-19-symptom-analysis?scriptVersionId=40251034&cellId=36
+def get_htmp_after_encod(dt): # dt: dataframe to make heatmap
     df = dt.copy()
     df = get_score(df)
     df = get_condition(df)
 
     from pylab import rcParams
     rcParams['figure.figsize'] = 13, 18
-    corrmat = df.corr()
+    corrmat = df.corr() # make correlation matrix
     cols = corrmat.index
-    cm = np.corrcoef(df[cols].values.T)
-    sns.set(font_scale=1.25)
+    cm = np.corrcoef(df[cols].values.T) # get correlation coefficient of correlation matrix
+    
+    sns.set(font_scale=1.25) # set heatmap plot
     sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f',
-                annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
+                annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values) # make heatmap
     plt.title('Heatmap of All data')
     plt.show()
 
@@ -255,11 +259,11 @@ def get_htmp_after_encod(dt):
 def do_PCA_partial(data_origin):  # PCA just for partial (drop severity:one-hot and Condition: string)
     dt = data_origin.copy()
     severity_columns = dt.filter(like='Severity_').columns
-    dt.drop(severity_columns, axis=1, inplace=True)
-    dt.drop('Condition', axis=1, inplace=True)
+    dt.drop(severity_columns, axis=1, inplace=True) # drop severity because they are one-hot encoded columns
+    dt.drop('Condition', axis=1, inplace=True) # drop condition because it is string
 
     scaler = preprocessing.StandardScaler()
-    train_df_scaled = scaler.fit_transform(dt)
+    train_df_scaled = scaler.fit_transform(dt) # data scaling
 
     pca = PCA(n_components=2)
     df = pca.fit_transform(train_df_scaled)
