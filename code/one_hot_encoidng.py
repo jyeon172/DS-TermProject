@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-def one_hot(dt, data_idx, prefix):  # one-hot encoding
+# one-hot encoding code resource: https://steadiness-193.tistory.com/99
+def one_hot(dt, data_idx, prefix): # dt: entire DataFrame to encode, data_idx: index of data to encode, prefix: feature prefix string to add after encoding
     all_ele = []
     data_col = dt.iloc[:, data_idx]  # get data column using index
 
@@ -13,7 +14,7 @@ def one_hot(dt, data_idx, prefix):  # one-hot encoding
     dumnie = pd.DataFrame(zero_matrix, columns=ele)
 
     for i, elem in enumerate(data_col):  # update one-hot table 1 for each element
-        index = dumnie.columns.get_indexer(elem.split(','))
+        index = dumnie.columns.get_indexer(elem.split(',')) # get index of dumnie data
         dumnie.iloc[i, index] = 1
 
     dt = dt.iloc[:, data_idx:]  # drop data before encoding
